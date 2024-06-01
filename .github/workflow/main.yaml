@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - master  # Adjust as needed
+      - master  
 
 jobs:
   build:
@@ -16,13 +16,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18'  # Adjust as needed
+          node-version: '18'  
 
       - name: Install dependencies
         run: npm install
 
-      # Add steps for building your Next.js app
-      # e.g., npm run build
+
 
   deploy:
     needs: build
@@ -40,5 +39,4 @@ jobs:
       - name: Install dependencies
         run: npm install --production
 
-      # Add steps for deploying your application
-      # e.g., using FTP, SCP, SSH, or deploying to cloud platforms like Vercel, AWS, or Heroku
+  
