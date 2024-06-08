@@ -1,6 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
+import { IconBadge } from "@/components/icon-badge";
+import { LayoutDashboard } from "lucide-react";
+import TitleForm from "./_components/page";
 
 
 
@@ -8,7 +11,6 @@ import { redirect } from "next/navigation";
 const CourseIdPage = async({params}: {params: {courseId: string}}) => {
 
     const {userId}  = auth();
-    console.log("THis is a userID from auth", userId);
     if(!userId) {
         return redirect("/");
     }
@@ -19,7 +21,6 @@ const CourseIdPage = async({params}: {params: {courseId: string}}) => {
 
         }
     });
-    console.log("I am the courses here !", courses);
 
     if(!courses) {
         return redirect("/");
@@ -49,6 +50,20 @@ const CourseIdPage = async({params}: {params: {courseId: string}}) => {
               Complete all the fields {completionText}
             </span>
           </div>
+        </div>
+        <div className="grid grid-col-1 md:grid-cols-2 gap-6 mt-16">
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge size="sm" variant="default" icon={LayoutDashboard}/>
+              <h2 className="text-md text-slate-600 font-medium md:text-xl">Customize your courses</h2>
+            </div>
+            <TitleForm
+            initialData= {courses}
+            courseId={courses.id}
+            />
+          </div>
+
+
         </div>
       </div>
     );
