@@ -17,29 +17,22 @@ import { useState } from "react";
 import { Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-
+import { Input } from "@/components/ui/input";
 import { Course } from "@prisma/client";
-import { Combobox } from "./combobox";
+import { formatPrice } from "@/lib/format";
 
-interface CategoryformProps {
+interface PriceformProps {
   initialData: Course;
   courseId: string;
-  options: { label: string; value: string }[];
-  
 }
 
 const formSchema = z.object({
-  categoryId: z.string().min(1),
+ price: z.coerce.number(),
 });
 
-const CategoryForm = ({
-  initialData,
-  courseId,
-  options,
-}: CategoryformProps) => {
+const PriceForm = ({ initialData, courseId }: PriceformProps) => {
   //Router Initialization
   const router = useRouter();
-  console.log('Options', JSON.stringify(options, null, 2))
 
   //hooks are defined here !
   const [isEditing, setisEditing] = useState(false);
@@ -50,15 +43,16 @@ const CategoryForm = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      categoryId: initialData?.categoryId || "",
+      price: initialData?.price || undefined,
     },
   });
- 
+
   const { isSubmitting, isValid } = form.formState;
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const result = await axios.patch(`/api/course/${courseId}`, values);
-      toast.success("Course Category updated successfully !");
+      toast.success("Course price Updated successfully !");
       ToggleEdit();
       router.refresh();
       console.log(" $[Data from Edited course", result);
@@ -66,28 +60,17 @@ const CategoryForm = ({
       toast.error("Something went wrong !");
     }
   };
-
-  console.log('initialData', JSON.stringify(initialData, null, 2))
-  console.log('courseId', JSON.stringify(courseId, null, 2))
-  // why we create the selectedOption variable because when we fetch the data of course title, course description , images , it comes whole object of data so it includes the categoryId also.
-  //option values are all course label=name, value=id we have joined the courses collection to category collection thats why we have to create the selectedOption variable.
-  // initialData.categoryId = "bdf27dc8-86f9-4119-821e-c83d96dd0125";
-  console.log('InitialData.categoryId', JSON.stringify(initialData.categoryId, null, 2))
-  const selectedOption = options.find((option) => option.value === initialData.categoryId);
-  console.log("@@@@@  the selected option will be@@@@@@@@@@", selectedOption);
-  console.log("____options from category form_______", options);
-
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="flex items-center justify-between font-medium">
-        Course category
+        Course Price
         <Button onClick={ToggleEdit} variant="ghost">
           {isEditing ? (
             <>Cancel</>
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit Category
+              Edit Price
             </>
           )}
         </Button>
@@ -96,10 +79,10 @@ const CategoryForm = ({
         <p
           className={cn(
             "text-sm mt-2",
-            !initialData.categoryId && "text-slate-500 italic"
+            !initialData.price && "text-slate-500 italic"
           )}
         >
-          {selectedOption?.label || "No Category"}
+         {initialData?.price ? formatPrice(initialData.price) : " No Price"}
         </p>
       )}
       {isEditing && (
@@ -110,11 +93,17 @@ const CategoryForm = ({
           >
             <FormField
               control={form.control}
-              name="categoryId"
+              name="price"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Combobox options={...options} {...field}/>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      disabled={isSubmitting}
+                      placeholder="Price of a course... "
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -132,4 +121,4 @@ const CategoryForm = ({
   );
 };
 
-export default CategoryForm;
+export default PriceForm;

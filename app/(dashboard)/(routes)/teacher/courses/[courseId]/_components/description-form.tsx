@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -55,7 +55,7 @@ const DescriptionForm = ({ initialData, courseId }: DescriptionformProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const result = await axios.patch(`/api/course/${courseId}`, values);
-      toast.success("Course Updated successfully !");
+      toast.success("Course description pdated successfully !");
       ToggleEdit();
       router.refresh();
       console.log(" $[Data from Edited course", result);
