@@ -1,9 +1,10 @@
-"use client"
+"use client";
 
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { cn } from "@/lib/utils";
 import {
   Form,
   FormControl,
@@ -17,108 +18,103 @@ import { useState } from "react";
 import { Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { Textarea } from "@/components/ui/textarea";
+import { Course } from "@prisma/client";
 
-interface TitleformProps {
-  initialData: {
-    title: string;
-  };
+
+interface DescriptionformProps {
+  initialData: Course;
   courseId: string;
 }
 
 const formSchema = z.object({
-  title: z.string().min(1, {
-    message: "Title is required",
+  description: z.string().min(1, {
+    message: "Description is required",
   }),
 });
 
-const TitleForm = ({ initialData, courseId }: TitleformProps) => {
-
+const DescriptionForm = ({ initialData, courseId }: DescriptionformProps) => {
   //Router Initialization
   const router = useRouter();
 
   //hooks are defined here !
   const [isEditing, setisEditing] = useState(false);
 
-  // functions are declared here 
-  const ToggleEdit = () => setisEditing((current ) => !current)
- 
-  
-
+  // functions are declared here
+  const ToggleEdit = () => setisEditing((current) => !current);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      description: initialData?.description || ""
+    },
   });
 
   const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try{
+    try {
       const result = await axios.patch(`/api/course/${courseId}`, values);
       toast.success("Course Updated successfully !");
       ToggleEdit();
       router.refresh();
       console.log(" $[Data from Edited course", result);
-    }catch {
+    } catch {
       toast.error("Something went wrong !");
-
     }
   };
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="flex items-center justify-between font-medium">
-        Course Title
+        Course description
         <Button onClick={ToggleEdit} variant="ghost">
           {isEditing ? (
             <>Cancel</>
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit Title
+              Edit Description
             </>
           )}
         </Button>
       </div>
       {!isEditing && (
-        <p className="text-sm mt-2 ">
-          {initialData.title}
-        </p>
+        <p className={cn("text-sm mt-2", !initialData.description && "text-slate-500 italic")}>
+            {initialData.description || "No description"}
+            </p>
       )}
       {isEditing && (
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 mt-4 "
-        >
-          <FormField 
-          control={form.control}
-          name="title"
-          render={( { field}) => (
-            <FormItem>
-              <FormControl>
-                <Input disabled={isSubmitting}
-                placeholder="e.g Advanced Ruby and Rails"
-                {...field}
-                />
-              </FormControl>
-              <FormMessage/>
-            </FormItem>
-          )}
-          />
-          <div className="flex items-center gap-x-2">
-            <Button disabled={!isValid || isSubmitting}
-            type="submit"
-            >
-              Save
-            </Button>
-
-          </div>
-
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 mt-4 "
+          >
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Textarea
+                      disabled={isSubmitting}
+                      placeholder="e.g Advanced Topics of art"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center gap-x-2">
+              <Button disabled={!isValid || isSubmitting} type="submit">
+                Save
+              </Button>
+            </div>
           </form>
-
         </Form>
       )}
     </div>
   );
 };
 
-export default TitleForm;
+export default DescriptionForm;
