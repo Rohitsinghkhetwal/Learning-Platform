@@ -9,6 +9,7 @@ import ImageForm from "./_components/image-form";
 import CategoryForm from "./_components/category-form";
 import PriceForm from "./_components/price-form";
 import AttachmentForm from "./_components/attachment-form";
+import ChapterForm from "./_components/chapter-form";
 
 
 
@@ -22,16 +23,24 @@ const CourseIdPage = async({params}: {params: {courseId: string}}) => {
 
     const courses = await db.course.findUnique({
         where: {
-            id: params.courseId
+            id: params.courseId,
+            userId,
         },
         include: {
+          chapters: {
+            orderBy: {
+              position: "asc"
+            },
+          },
           attachments: {
             orderBy: {
               createdAt: "desc"
-            }
-          }
+            },
+          },
         }
     });
+
+    console.log("THis is Course @ from courses, ######", courses);
 
     const Category = await db.category.findMany({
       orderBy: {
@@ -50,7 +59,8 @@ const CourseIdPage = async({params}: {params: {courseId: string}}) => {
         courses.description,
         courses.price,
         courses.imageUrl,
-        courses.categoryId
+        courses.categoryId,
+        courses.chapters.some(chapter => chapter.isPublished),
     ];
 
     const totalFields = requireFields.length;
@@ -97,7 +107,7 @@ const CourseIdPage = async({params}: {params: {courseId: string}}) => {
                 <IconBadge size="sm" icon={ListChecks} />
                 <h2 className="text-xl font-medium">Chapters</h2>
               </div>
-              <div>Todo:Chapters</div>
+              <ChapterForm initialData={courses} courseId={courses.id} />
             </div>
 
             <div>

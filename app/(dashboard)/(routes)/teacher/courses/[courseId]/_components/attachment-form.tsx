@@ -4,7 +4,7 @@ import * as z from "zod";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { File, PlusCircle } from "lucide-react";
+import { File, Loader2, PlusCircle, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Attachment, Course } from "@prisma/client";
@@ -25,6 +25,7 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentformProps) => {
 
   //hooks are defined here !
   const [isEditing, setisEditing] = useState(false);
+  const [deletingID, setDeletingID] = useState<string | null>(null);
 
   // functions are declared here
   const ToggleEdit = () => setisEditing((current) => !current);
@@ -39,6 +40,21 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentformProps) => {
       toast.error("Something went wrong !");
     }
   };
+
+  const handleDelete = async(id: string) => {
+    try{
+      setDeletingID(id);
+      await axios.delete(`/api/course/${courseId}/attachments/${id}`);
+      toast.success("Attachment deleted successfully !");
+      router.refresh();
+
+    }catch{
+      toast.error("Attachment not Deleted !")
+    }finally {
+      setDeletingID(null);
+    }
+
+  }
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="flex items-center justify-between font-medium">
@@ -65,10 +81,22 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentformProps) => {
             <div className="space-y-2">
                 {initialData.attachments.map((attachment) => (
                     <div key={attachment.id}
-                    className="flex items-center p-3 w-full bg-green-200 border-green-200 rounded-md"
+                    className="flex items-center p-3 w-full bg-blue-200 border border-blue-500 rounded-md"
                     > 
                     <File className="h-4 w-4 mr-2 flex-shrink-0"/>
                     <p className="text-xs line-clamp-1">{attachment.name}</p>
+                    {deletingID === attachment.id && (
+                      <div className="ml-6"> 
+                        <Loader2 className="h-4 w-4 animate-spin"/>
+                      </div>
+                    )}
+                    {deletingID != attachment.id && (
+                      <button className="ml-6 hover:opacity-75 transition"
+                      onClick={() => handleDelete(attachment.id)}
+                      >
+                        <X className="h-4 w-4"/>
+                      </button>
+                    )}
                         
                     </div>
                 ))}

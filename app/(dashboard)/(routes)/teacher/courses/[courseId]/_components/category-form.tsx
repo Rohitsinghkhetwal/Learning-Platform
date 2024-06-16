@@ -39,7 +39,6 @@ const CategoryForm = ({
 }: CategoryformProps) => {
   //Router Initialization
   const router = useRouter();
-  console.log('Options', JSON.stringify(options, null, 2))
 
   //hooks are defined here !
   const [isEditing, setisEditing] = useState(false);
@@ -67,15 +66,11 @@ const CategoryForm = ({
     }
   };
 
-  console.log('initialData', JSON.stringify(initialData, null, 2))
-  console.log('courseId', JSON.stringify(courseId, null, 2))
   // why we create the selectedOption variable because when we fetch the data of course title, course description , images , it comes whole object of data so it includes the categoryId also.
   //option values are all course label=name, value=id we have joined the courses collection to category collection thats why we have to create the selectedOption variable.
   // initialData.categoryId = "bdf27dc8-86f9-4119-821e-c83d96dd0125";
-  console.log('InitialData.categoryId', JSON.stringify(initialData.categoryId, null, 2))
+  
   const selectedOption = options.find((option) => option.value === initialData.categoryId);
-  console.log("@@@@@  the selected option will be@@@@@@@@@@", selectedOption);
-  console.log("____options from category form_______", options);
 
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
