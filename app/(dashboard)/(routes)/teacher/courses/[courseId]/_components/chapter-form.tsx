@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { Chapter, Course } from "@prisma/client";
 import { Input } from "@/components/ui/input";
+import ChapterLists from "./chapterLists";
 
 interface ChapterformProps {
   initialData: Course & {chapters: Chapter[]};
@@ -92,7 +93,7 @@ const ChapterForm = ({ initialData, courseId }: ChapterformProps) => {
                   <FormControl>
                     <Input
                       disabled={isSubmitting}
-                      placeholder="e.g Advanced Topics of art"
+                      placeholder="e.g Add Chapters"
                       {...field}
                     />
                   </FormControl>
@@ -112,6 +113,11 @@ const ChapterForm = ({ initialData, courseId }: ChapterformProps) => {
         <div className={cn("text-sm mt-2 ",
             !initialData.chapters.length && "text-slate-400 italic")}>
                 {!initialData.chapters.length && " No Chapters"}
+                <ChapterLists 
+                onEdit={() => {}}
+                onReorder={() => {}}
+                items={initialData.chapters || []}
+                />
             </div>
       )}
 
