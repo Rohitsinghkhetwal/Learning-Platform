@@ -2,7 +2,7 @@
 "use client"
 
 import { Chapter } from "@prisma/client";
-import { Grid, Grip } from "lucide-react";
+import { Grid, Grip, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
     DragDropContext,
@@ -11,6 +11,7 @@ import {
     DropResult
 } from "@hello-pangea/dnd"
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 
 
@@ -22,6 +23,7 @@ interface ChapterlistProps {
 }
 
 const ChapterLists = ({onEdit, onReorder, items}: ChapterlistProps) => {
+    console.log("This is the items from ChapterList", items);
     const [isMounted, setisMounted] = useState(false);
     const [chapters, setChapters] = useState(items);
 
@@ -56,12 +58,27 @@ const ChapterLists = ({onEdit, onReorder, items}: ChapterlistProps) => {
                                     </div>
                                     {chapter.title}
 
+                                    <div className="ml-auto pr-2 flex items-center gap-x-2">
+                                        {chapter.isFree && (
+                                            <Badge>
+                                                Free
+                                            </Badge>
+                                        )}
+                                        <Badge className={cn("bg-slate-500", chapter.isPublished && "bg-sky-700")}>
+                                            {chapter.isPublished ? " Published" : "Draft"}
+                                        </Badge>
+                                        <Pencil
+                                        onClick={() => onEdit(chapter.id)}
+                                         className="w-4 h-4 cursor-pointer hover:opacity-75 transition"/>
+
+                                    </div>
+
                                 </div>
                             )}
 
                         </Draggable>
                     ))}
-
+                    {provided.placeholder}
                 </div>
 
             )}
